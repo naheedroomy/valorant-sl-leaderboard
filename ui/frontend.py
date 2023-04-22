@@ -6,6 +6,7 @@ import streamlit as st
 from main_leaderboard import show_main_leaderboard
 from registration_page import show_registration_page
 from alpha_leaderboard import show_alpha_leaderboard
+from placeholder import show_placeholder_alpha
 
 st.set_page_config(page_title="SL Valorant Leaderboard", page_icon="https://www.kindpng.com/picc/m/130-1306616_lk-sri-lanka-flag-icon-sri-lanka-flag.png")
 
@@ -52,4 +53,5 @@ elif page == "Competitive Ranked Leaderboard":
     show_main_leaderboard()
 
 elif page == "10 mans - Alpha Leaderboard":
-    show_alpha_leaderboard()
+    # show_alpha_leaderboard()
+    show_placeholder_alpha()
