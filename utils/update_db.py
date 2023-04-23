@@ -17,6 +17,7 @@ class MongoUserLeaderBoard(Document):
     puuid = StringField(required=True, unique=True)
     riot_username = StringField(required=True)
     discord_username = StringField(required=True, unique=True)
+    discord_id = StringField(required=False)
     updated_at = DateTimeField(required=False)
 
 MONGO_PASSWORD = os.getenv('MONGO_PASSWORD')
