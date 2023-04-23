@@ -92,7 +92,7 @@ class MongoTempUserNew(Document):
 class MongoUserLeaderBoard(Document):
     meta = {'collection': 'user_leaderboard'}
     _id = ObjectIdField
-    elo = FloatField(required=True)
+    elo = FloatField(required=True, default=0.0)
     rank = StringField(required=True)
     puuid = StringField(required=True, unique=True)
     riot_username = StringField(required=True)

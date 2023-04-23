@@ -13,6 +13,7 @@ leaderboard = APIRouter(prefix="/leaderboard", tags=["leaderboard"])
 NQ_API_KEY = os.environ.get("NEATQUEUE_API")
 api_key_header = APIKeyHeader(name="Authorization", auto_error=True)
 
+
 @leaderboard.post('/register')
 async def create_user_leaderboard(user: UserLeaderBoard):
     users_puuid = MongoUserLeaderBoard.objects(puuid=user.puuid).first()

@@ -12,7 +12,7 @@ API_TOKEN = os.getenv('HENRIK_API_TOKEN')
 class MongoUserLeaderBoard(Document):
     meta = {'collection': 'user_leaderboard'}
     _id = ObjectIdField
-    elo = FloatField(required=True)
+    elo = FloatField(required=True, default=0.0)
     rank = StringField(required=True)
     puuid = StringField(required=True, unique=True)
     riot_username = StringField(required=True)
@@ -65,7 +65,7 @@ async def update_all_users():
                     "large_image_url": None,
                     "ranking_in_tier": None,
                     "mmr_change_to_last_game": None,
-                    "elo": None,
+                    "elo": 0.0,
                     "name_and_tag": f"{acc_name} #{acc_tag}"
                 }
             else:

@@ -249,7 +249,7 @@ async def get_account_details(puuid: str):
                 "large_image_url": None,
                 "ranking_in_tier": None,
                 "mmr_change_to_last_game": None,
-                "elo": 0,
+                "elo": 0.0,
                 "name_and_tag": f"{acc_name} #{acc_tag}"
             }
         else:
