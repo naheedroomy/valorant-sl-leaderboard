@@ -136,6 +136,7 @@ async def update_member_roles(member, tier_icons):
         unverified_role = discord.utils.get(member.guild.roles, name="Unverified")
         if unverified_role in member.roles:
             await member.remove_roles(unverified_role)
+            logging.info(f"Removed unverified role from {discord_username}.")
 
         rank = result.get("rank")
         original_rank = rank
