@@ -4,7 +4,7 @@ import time
 from datetime import datetime
 import asyncio
 import aiohttp
-from mongoengine import Document, ObjectIdField, FloatField, StringField, connect, DateTimeField
+from mongoengine import Document, ObjectIdField, FloatField, StringField, connect, DateTimeField, IntField
 
 API_TOKEN = os.getenv('HENRIK_API_TOKEN')
 
@@ -17,7 +17,7 @@ class MongoUserLeaderBoard(Document):
     puuid = StringField(required=True, unique=True)
     riot_username = StringField(required=True)
     discord_username = StringField(required=True, unique=True)
-    discord_id = StringField(required=False)
+    discord_id = IntField(required=False, default=0)
     updated_at = DateTimeField(required=False)
 
 MONGO_PASSWORD = os.getenv('MONGO_PASSWORD')

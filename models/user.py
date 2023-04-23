@@ -97,7 +97,7 @@ class MongoUserLeaderBoard(Document):
     puuid = StringField(required=True, unique=True)
     riot_username = StringField(required=True)
     discord_username = StringField(required=True, unique=True)
-    discord_id = StringField(required=False)
+    discord_id = IntField(required=False, default=0)
     updated_at = DateTimeField(required=False)
 
 
