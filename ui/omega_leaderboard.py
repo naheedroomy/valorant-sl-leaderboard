@@ -2,11 +2,9 @@ import streamlit as st
 import pandas as pd
 import requests
 
-def show_alpha_leaderboard():
 
-
-
-    response = requests.get("http://localhost:8000/leaderboard/alpha")
+def show_omega_leaderboard():
+    response = requests.get("http://localhost:8000/leaderboard/omega")
     leaderboard_data = response.json()
 
     if leaderboard_data == []:

@@ -6,9 +6,11 @@ import streamlit as st
 from main_leaderboard import show_main_leaderboard
 from registration_page import show_registration_page
 from alpha_leaderboard import show_alpha_leaderboard
-from placeholder import show_placeholder_alpha
+from placeholder import show_placeholder_alpha, show_placeholder_omega
+from omega_leaderboard import show_omega_leaderboard
 
-st.set_page_config(page_title="SL Valorant Leaderboard", page_icon="https://www.kindpng.com/picc/m/130-1306616_lk-sri-lanka-flag-icon-sri-lanka-flag.png")
+st.set_page_config(page_title="SL Valorant Leaderboard",
+                   page_icon="https://www.kindpng.com/picc/m/130-1306616_lk-sri-lanka-flag-icon-sri-lanka-flag.png")
 
 hide_st_style = """
             <style>
@@ -18,7 +20,6 @@ hide_st_style = """
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
-
 
 
 def get_rank_color(rank):
@@ -44,7 +45,7 @@ def get_rank_color(rank):
         return "black"
 
 
-page = st.sidebar.radio("Navigation: ", ("Competitive Ranked Leaderboard", "10 mans - Alpha Leaderboard", "Register"))
+page = st.sidebar.radio("Navigation: ", ("Competitive Ranked Leaderboard", "10 mans - Alpha Leaderboard", "10 mans - Omega Leaderboard", "Register"))
 
 if page == "Register":
     show_registration_page()
@@ -53,5 +54,18 @@ elif page == "Competitive Ranked Leaderboard":
     show_main_leaderboard()
 
 elif page == "10 mans - Alpha Leaderboard":
-    # show_alpha_leaderboard()
-    show_placeholder_alpha()
+    st.title("Alpha Leaderboard")
+    st.write("The Alpha (Platinum+) Queue Leaderboard. 10 mans are held in the discord server! :)")
+    st.markdown("[Join the server!](https://discord.gg/kKVqZ4Du3J)")
+    success = show_alpha_leaderboard()
+    if not success:
+        show_placeholder_alpha()
+
+
+elif page == "10 mans - Omega Leaderboard":
+    st.title("Omega Leaderboard")
+    st.write("The Omega (Iron-Gold) Queue Leaderboard. 10 mans are held in the discord server! :)")
+    st.markdown("[Join the server!](https://discord.gg/kKVqZ4Du3J)")
+    success = show_omega_leaderboard()
+    if not success:
+        show_placeholder_omega()
