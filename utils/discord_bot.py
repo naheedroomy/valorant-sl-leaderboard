@@ -28,7 +28,7 @@ logging.basicConfig(
 
 mongo_client = pymongo.MongoClient(
     f"mongodb+srv://naheedroomy:{MONGO_PASSWORD}@{MONGO_HOST}?retryWrites=true&w=majority")
-db = mongo_client["test"]
+db = mongo_client["live"]
 collection = db["user_leaderboard"]
 
 
