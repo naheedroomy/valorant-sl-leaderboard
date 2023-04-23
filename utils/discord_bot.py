@@ -109,12 +109,43 @@ async def update_user_message():
 async def before_update_user_message():
     await client.wait_until_ready()
 
+async def update_alpha_omega_roles(member, rank):
+    alpha_ranks = ['Platinum', 'Diamond', 'Immortal', 'Ascendant', 'Radiant']
+    omega_ranks = ['Gold', 'Silver', 'Iron', 'Bronze']
+
+    alpha_role = discord.utils.get(member.guild.roles, name="Alpha")
+    omega_role = discord.utils.get(member.guild.roles, name="Omega")
+
+    if rank in alpha_ranks:
+        if omega_role in member.roles:
+            await member.remove_roles(omega_role)
+        if alpha_role not in member.roles:
+            await member.add_roles(alpha_role)
+
+    elif rank in omega_ranks:
+        if alpha_role in member.roles:
+            await member.remove_roles(alpha_role)
+        if omega_role not in member.roles:
+            await member.add_roles(omega_role)
+
+    else:
+        if alpha_role in member.roles:
+            await member.remove_roles(alpha_role)
+        if omega_role in member.roles:
+            await member.remove_roles(omega_role)
 
 async def update_member_roles(member, tier_icons):
     time.sleep(1.2)
 
     manual_role = discord.utils.get(member.guild.roles, name="Manual")
     if manual_role in member.roles:
+        rank_roles = ['Ascendant', 'Diamond', 'Immortal', 'Radiant', 'Gold', 'Platinum', 'Silver', 'Iron', 'Bronze',
+                      'Unranked']
+        current_rank_role = next((role for role in member.roles if role.name in rank_roles), None)
+
+        if current_rank_role:
+            await update_alpha_omega_roles(member, current_rank_role.name)
+
         return
 
     discord_id = member.id
@@ -176,6 +207,8 @@ async def update_member_roles(member, tier_icons):
                 manual_role = discord.utils.get(member.guild.roles, name="Manual")
                 if manual_role not in member.roles:
                     await member.add_roles(manual_role)
+
+            await update_alpha_omega_roles(member, rank)
     else:
         unverified_role = discord.utils.get(member.guild.roles, name="Unverified")
         await member.add_roles(unverified_role)
