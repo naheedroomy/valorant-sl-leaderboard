@@ -130,8 +130,8 @@ async def get_user_data():
             for item in alltime_data
         ]
 
-        # Sort the processed_data array by rank
-        sorted_data = sorted(processed_data, key=lambda x: x["rank"])
+        # Sort the processed_data array by mmr, highest to lowest
+        sorted_data = sorted(processed_data, key=lambda x: x["mmr"], reverse=True)
 
         return JSONResponse(status_code=200, content=sorted_data)
     else:

@@ -58,8 +58,8 @@ elif page == "10 mans - Alpha Leaderboard":
     st.write("The Alpha (Platinum+) Queue Leaderboard. 10 mans are held in the discord server! :)")
     st.markdown("[Join the server!](https://discord.gg/kKVqZ4Du3J)")
     success = show_alpha_leaderboard()
-    if not success:
-        show_placeholder_alpha()
+    # if not success:
+    #     show_placeholder_alpha()
 
 
 elif page == "10 mans - Omega Leaderboard":
@@ -67,5 +67,5 @@ elif page == "10 mans - Omega Leaderboard":
     st.write("The Omega (Iron-Gold) Queue Leaderboard. 10 mans are held in the discord server! :)")
     st.markdown("[Join the server!](https://discord.gg/kKVqZ4Du3J)")
     success = show_omega_leaderboard()
-    if not success:
-        show_placeholder_omega()
+    # if not success:
+    #     show_placeholder_omega()
