@@ -224,7 +224,7 @@ async def on_member_join(member):
 
 # Create a lock to prevent overlapping tasks
 
-@tasks.loop(minutes=45)
+@tasks.loop(minutes=30)
 async def update_all_member_roles():
     tier_icons = await fetch_tier_data()
     for guild in client.guilds:
