@@ -78,7 +78,7 @@ def checker(loginrequest : RiotLogin):
         r = session.post(f'https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers)
         if not "html" in r.text:
             successfulr1 = True
-    time.sleep(5)
+    
     successfulr2 = False
     while successfulr2 == False:
         data = {
@@ -92,7 +92,7 @@ def checker(loginrequest : RiotLogin):
 
         if not "html" in r.text:
             successfulr2 = True
-    time.sleep(5)
+    
     if not "auth_failure" in r2.text:
 
         if "multifactor" in r2.text:

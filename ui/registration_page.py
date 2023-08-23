@@ -13,6 +13,10 @@ def show_registration_page():
     st.markdown("""
         # Register your account
         """)
+    st.markdown("""
+            # !!!Registration currently broken, please try again later!!!
+            """)
+
     # Initialize session state variables
     if 'username' not in st.session_state:
         st.session_state.username = ""
