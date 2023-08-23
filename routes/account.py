@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import time
 from collections import OrderedDict
 
 import aiohttp
@@ -39,7 +40,7 @@ def create_sesh(retries=3, backoff_factor=0.3, status_forcelist=(500, 502, 504))
     headers = OrderedDict({
         "Accept-Language": "en-US,en;q=0.9",
         "Accept": "application/json, text/plain, */*",
-        'User-Agent': f"RiotClient/{riot_client_build} rso-auth (Windows; 10;;Professional, x64)"
+        'User-Agent': "ShooterGame/11 Windows/10.0.22621.1.768.64bit"
     })
 
     session.headers.update(headers)  # Update the session headers
@@ -48,7 +49,7 @@ def create_sesh(retries=3, backoff_factor=0.3, status_forcelist=(500, 502, 504))
         total=retries,
         backoff_factor=backoff_factor,
         status_forcelist=status_forcelist,
-        method_whitelist=frozenset(['GET', 'POST', 'PUT']),
+        allowed_methods=frozenset(['GET', 'POST', 'PUT']),
     )
 
     adapter = HTTPAdapter(max_retries=retry)
@@ -72,12 +73,12 @@ def checker(loginrequest : RiotLogin):
         }
         headers = {
             'Content-Type': 'application/json',
-            'User-Agent': f"RiotClient/{riot_client_build} rso-auth (Windows; 10;;Professional, x64)",
+            'User-Agent': "ShooterGame/11 Windows/10.0.22621.1.768.64bit",
         }
         r = session.post(f'https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers)
         if not "html" in r.text:
             successfulr1 = True
-
+    time.sleep(5)
     successfulr2 = False
     while successfulr2 == False:
         data = {
@@ -91,7 +92,7 @@ def checker(loginrequest : RiotLogin):
 
         if not "html" in r.text:
             successfulr2 = True
-
+    time.sleep(5)
     if not "auth_failure" in r2.text:
 
         if "multifactor" in r2.text:
@@ -111,7 +112,7 @@ def checker(loginrequest : RiotLogin):
             access_token = re.split(r'&', access_token)[0]
 
             headers = {
-                'User-Agent': f"RiotClient/{riot_client_build} rso-auth (Windows; 10;;Professional, x64)",
+                'User-Agent': "ShooterGame/11 Windows/10.0.22621.1.768.64bit",
                 'Authorization': f'Bearer {access_token}',
             }
             r4 = session.post('https://entitlements.auth.riotgames.com/api/token/v1',
@@ -170,7 +171,7 @@ async def login_2fa(username: str, code: str):
         }
         headers = {
             'Content-Type': 'application/json',
-            'User-Agent': f"RiotClient/{riot_client_build} rso-auth (Windows; 10;;Professional, x64)",
+            'User-Agent': "ShooterGame/11 Windows/10.0.22621.1.768.64bit",
         }
         r3 = session.put('https://auth.riotgames.com/api/v1/authorization',
                          json=data, headers=headers,
@@ -185,7 +186,7 @@ async def login_2fa(username: str, code: str):
         access_token = re.split(r'&', access_token)[0]
 
         headers = {
-            'User-Agent': f"RiotClient/{riot_client_build} rso-auth (Windows; 10;;Professional, x64)",
+            'User-Agent': "ShooterGame/11 Windows/10.0.22621.1.768.64bit",
             'Authorization': f'Bearer {access_token}',
         }
         r4 = session.post('https://entitlements.auth.riotgames.com/api/token/v1',
