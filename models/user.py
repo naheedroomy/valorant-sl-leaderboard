@@ -48,13 +48,12 @@ class MongoPasswordHistory(Document):
 
 
 class MongoQueue(Document):
-    meta={'collection': 'queue'}
+    meta = {'collection': 'queue'}
     queue = ListField(ObjectIdField())
 
 
 class MongoMatch(Document):
     selected_for_match = ListField(ObjectIdField())
-
 
 
 class UserNew(BaseModel):
@@ -64,6 +63,7 @@ class UserNew(BaseModel):
     verification_code: Optional[constr(min_length=1, max_length=50)]
     first_name: Optional[constr(min_length=1, max_length=50)]
     last_name: Optional[constr(min_length=1, max_length=50)]
+
 
 # create MongoUserNew
 class MongoUserNew(Document):
@@ -102,12 +102,11 @@ class MongoUserLeaderBoard(Document):
 
 
 class UserLeaderBoard(BaseModel):
-    elo: Optional[constr(min_length=1, max_length=50)]
+    elo: Optional[float]
     rank: Optional[constr(min_length=1, max_length=50)]
     puuid: Optional[constr(min_length=1, max_length=50)]
     riot_username: Optional[constr(min_length=1, max_length=50)]
     discord_username: Optional[constr(min_length=1, max_length=50)]
-
 
 
 class DiscordRequest(BaseModel):

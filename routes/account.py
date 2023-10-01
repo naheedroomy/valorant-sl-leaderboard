@@ -265,4 +265,5 @@ async def get_account_details(puuid: str):
                 "name_and_tag": f"{acc_name} #{acc_tag}"
             }
 
+
         return account_json
