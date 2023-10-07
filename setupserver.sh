@@ -3,6 +3,15 @@
 # Update the package list and install nginx
 sudo apt update
 sudo apt install -y nginx
+sudo apt install -y python3-pip
+
+pip install virtualenv
+virtualenv venv
+source venv/bin/activate
+apt-get install redis-server
+systemctl start redis-server
+systemctl enable redis-server
+pip install -r requirements.txt
 
 # Create the nginx server block configuration
 cat <<EOL | sudo tee /etc/nginx/sites-available/valorant.conf
