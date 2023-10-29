@@ -91,6 +91,8 @@ async def update_member_roles(member, tier_icons):
     result = collection.find_one(query)
 
     if result:
+        logging.info("Bot 2 - Processing: " + discord_username)
+
         # Update discord_username in the database if discord_id exists and discord_username is different
         if "discord_id" in result and discord_id != 0 and result["discord_username"] != discord_username:
             update_query = {"discord_id": discord_id}
@@ -122,6 +124,7 @@ async def update_member_roles(member, tier_icons):
                 logging.info(f"Updated nickname - {discord_username} - {new_nickname}.")
             except discord.errors.Forbidden:
                 logging.error(f"Failed to update nickname for {discord_username} due to insufficient permissions.")
+                return
 
         if rank:
             rank_roles = ['Ascendant', 'Diamond', 'Immortal', 'Radiant', 'Gold', 'Platinum', 'Silver', 'Iron', 'Bronze',
