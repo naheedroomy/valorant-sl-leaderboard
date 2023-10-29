@@ -4,8 +4,8 @@ import time
 
 import aiohttp
 import discord
-import pymongo
 from discord.ext import tasks
+import pymongo
 
 # Define intents
 intents = discord.Intents.default()
@@ -17,9 +17,6 @@ client = discord.Client(intents=intents)
 MONGO_PASSWORD = os.getenv('MONGO_PASSWORD')
 MONGO_HOST = os.getenv('MONGO_HOST')
 DISCORD_BOT_TOKEN_1 = os.getenv('DISCORD_BOT_TOKEN')
-DISCORD_BOT_TOKEN_2 = os.getenv('DISCORD_BOT_TOKEN_2')
-DISCORD_BOT_TOKEN_3 = os.getenv('DISCORD_BOT_TOKEN_3')
-BOT_NUMBER = int(os.getenv('BOT_NUMBER'))
 
 logging.basicConfig(
     filename='/root/log/discord_roles.log',
@@ -229,18 +226,7 @@ async def update_all_member_roles():
     tier_icons = await fetch_tier_data()
     for guild in client.guilds:
         members = [member for member in guild.members if not member.bot]
-        members_count = len(members)
-
-        # Divide the members between the bots
-        members_third = members_count // 3
-        if BOT_NUMBER == 1:
-            members_to_process = members[:members_third]
-        elif BOT_NUMBER == 2:
-            members_to_process = members[members_third:2*members_third]
-        else:  # BOT_NUMBER == 3
-            members_to_process = members[2*members_third:]
-
-        for member in members_to_process:
+        for member in members:
             await update_member_roles(member, tier_icons)
 
 
@@ -255,9 +241,4 @@ async def on_ready():
     update_user_message.start()
 
 
-if BOT_NUMBER == 1:
-    client.run(DISCORD_BOT_TOKEN_1)
-elif BOT_NUMBER == 2:
-    client.run(DISCORD_BOT_TOKEN_2)
-elif BOT_NUMBER == 3:
-    client.run(DISCORD_BOT_TOKEN_3)
+client.run(DISCORD_BOT_TOKEN_1)
