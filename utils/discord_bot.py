@@ -11,12 +11,16 @@ import pymongo
 intents = discord.Intents.default()
 intents.members = True
 
-client = discord.Client(intents=intents)
+# List of bot tokens
+bot_tokens = [
+    os.getenv('DISCORD_BOT_TOKEN_1'),
+    os.getenv('DISCORD_BOT_TOKEN_2'),
+    os.getenv('DISCORD_BOT_TOKEN_3'),
+]
 
 # Set up connection to MongoDB
 MONGO_PASSWORD = os.getenv('MONGO_PASSWORD')
 MONGO_HOST = os.getenv('MONGO_HOST')
-DISCORD_BOT_TOKEN_1 = os.getenv('DISCORD_BOT_TOKEN')
 
 logging.basicConfig(
     filename='/root/log/discord_roles.log',
@@ -30,7 +34,6 @@ mongo_client = pymongo.MongoClient(
 db = mongo_client["live"]
 collection = db["user_leaderboard"]
 
-
 async def fetch_tier_data():
     async with aiohttp.ClientSession() as session:
         async with session.get('https://valorant-api.com/v1/competitivetiers') as response:
@@ -43,70 +46,6 @@ async def fetch_tier_data():
                 logging.error(f"Failed to fetch tier data: {response.status}")
                 return {}
 
-
-async def generate_user_message(guild):
-    verified_role = discord.utils.get(guild.roles, name="Verified")
-    verified_members = [m for m in guild.members if verified_role in m.roles and not m.bot]
-
-    user_message = ""
-
-    for member in verified_members:
-        discord_username = str(member)
-
-        query = {"discord_username": discord_username}
-        result = collection.find_one(query)
-
-        if result:
-            riot_id = result.get("riot_username")
-            discord_username = discord_username.split("#")[0]
-            user_message += f"{discord_username} --> {riot_id}\n"
-        else:
-            logging.warning(f"No database entry found for: {discord_username}")
-
-    return user_message
-
-
-@tasks.loop(minutes=5)
-async def update_user_message():
-    for guild in client.guilds:
-        channel = client.get_channel(1095889534111203448)
-        if not channel:
-            logging.error("Channel not found.")
-            continue
-
-        message = await generate_user_message(guild)
-
-        # Split the message into multiple parts without cutting names
-        message_parts = []
-        while len(message) > 2000:
-            split_index = message[:2000].rfind('\n')
-            message_parts.append(message[:split_index])
-            message = message[split_index+1:]
-        message_parts.append(message)
-
-        # Search for the bot's last messages in the channel
-        bot_messages = []
-        async for m in channel.history(limit=10):
-            if m.author == client.user:
-                bot_messages.append(m)
-
-        # Delete old bot messages if there are more messages than message parts
-        if len(bot_messages) > len(message_parts):
-            for i in range(len(message_parts), len(bot_messages)):
-                await bot_messages[i].delete()
-
-        # If a bot message was found, edit it. Otherwise, send a new message.
-        for i, message_part in enumerate(message_parts):
-            if i < len(bot_messages):
-                await bot_messages[i].edit(content=message_part)
-            else:
-                await channel.send(message_part)
-
-
-
-@update_user_message.before_loop
-async def before_update_user_message():
-    await client.wait_until_ready()
 
 async def update_alpha_omega_roles(member, rank):
     alpha_ranks = ['Platinum', 'Diamond', 'Immortal', 'Ascendant', 'Radiant']
@@ -133,7 +72,8 @@ async def update_alpha_omega_roles(member, rank):
         if omega_role in member.roles:
             await member.remove_roles(omega_role)
 
-async def update_member_roles(member, tier_icons):
+
+async def update_member_roles(member, tier_icons, bot_index):
     time.sleep(1.2)
 
     manual_role = discord.utils.get(member.guild.roles, name="Manual")
@@ -213,32 +153,46 @@ async def update_member_roles(member, tier_icons):
         await member.add_roles(unverified_role)
 
 
-@client.event
-async def on_member_join(member):
-    tier_icons = await fetch_tier_data()
-    await update_member_roles(member, tier_icons)
+class DiscordBot(discord.Client):
+    def __init__(self, bot_index, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.bot_index = bot_index
+
+    async def on_member_join(self, member):
+        tier_icons = await fetch_tier_data()
+        await update_member_roles(member, tier_icons, self.bot_index)
+
+    async def on_ready(self):
+        logging.info(f"{self.user} has connected to Discord!")
+
+        update_all_member_roles.start(self)
+
+    @tasks.loop(minutes=30)
+    async def update_all_member_roles(self):
+        tier_icons = await fetch_tier_data()
+        for guild in self.guilds:
+            members = [member for member in guild.members if not member.bot]
+            member_chunks = [members[i:i + len(members) // 3] for i in range(0, len(members), len(members) // 3)]
+            for member in member_chunks[self.bot_index]:
+                await update_member_roles(member, tier_icons, self.bot_index)
+
+    @update_all_member_roles.before_loop
+    async def before_update_all_member_roles(self):
+        await self.wait_until_ready()
 
 
-# Create a lock to prevent overlapping tasks
+def main():
+    bots = []
+    for i in range(3):
+        bot = DiscordBot(bot_index=i, intents=intents)
+        bots.append(bot)
 
-@tasks.loop(minutes=30)
-async def update_all_member_roles():
-    tier_icons = await fetch_tier_data()
-    for guild in client.guilds:
-        members = [member for member in guild.members if not member.bot]
-        for member in members:
-            await update_member_roles(member, tier_icons)
+    for i, bot in enumerate(bots):
+        bot.loop.create_task(bot.start(bot_tokens[i]))
 
-
-@update_all_member_roles.before_loop
-async def before_update_all_member_roles():
-    await client.wait_until_ready()
+    for bot in bots:
+        bot.loop.run_forever()
 
 
-@client.event
-async def on_ready():
-    update_all_member_roles.start()
-    update_user_message.start()
-
-
-client.run(DISCORD_BOT_TOKEN_1)
+if __name__ == "__main__":
+    main()
