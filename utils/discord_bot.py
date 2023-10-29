@@ -11,16 +11,16 @@ import pymongo
 intents = discord.Intents.default()
 intents.members = True
 
-# List of bot tokens
-bot_tokens = [
-    os.getenv('DISCORD_BOT_TOKEN_1'),
-    os.getenv('DISCORD_BOT_TOKEN_2'),
-    os.getenv('DISCORD_BOT_TOKEN_3'),
-]
+client1 = discord.Client(intents=intents)
+client2 = discord.Client(intents=intents)
+client3 = discord.Client(intents=intents)
 
 # Set up connection to MongoDB
 MONGO_PASSWORD = os.getenv('MONGO_PASSWORD')
 MONGO_HOST = os.getenv('MONGO_HOST')
+DISCORD_BOT_TOKEN_1 = os.getenv('DISCORD_BOT_TOKEN_1')
+DISCORD_BOT_TOKEN_2 = os.getenv('DISCORD_BOT_TOKEN_2')
+DISCORD_BOT_TOKEN_3 = os.getenv('DISCORD_BOT_TOKEN_3')
 
 logging.basicConfig(
     filename='/root/log/discord_roles.log',
@@ -34,6 +34,7 @@ mongo_client = pymongo.MongoClient(
 db = mongo_client["live"]
 collection = db["user_leaderboard"]
 
+
 async def fetch_tier_data():
     async with aiohttp.ClientSession() as session:
         async with session.get('https://valorant-api.com/v1/competitivetiers') as response:
@@ -45,7 +46,6 @@ async def fetch_tier_data():
             else:
                 logging.error(f"Failed to fetch tier data: {response.status}")
                 return {}
-
 
 async def update_alpha_omega_roles(member, rank):
     alpha_ranks = ['Platinum', 'Diamond', 'Immortal', 'Ascendant', 'Radiant']
@@ -73,7 +73,7 @@ async def update_alpha_omega_roles(member, rank):
             await member.remove_roles(omega_role)
 
 
-async def update_member_roles(member, tier_icons, bot_index):
+async def update_member_roles(member, tier_icons):
     time.sleep(1.2)
 
     manual_role = discord.utils.get(member.guild.roles, name="Manual")
@@ -152,47 +152,31 @@ async def update_member_roles(member, tier_icons, bot_index):
         unverified_role = discord.utils.get(member.guild.roles, name="Unverified")
         await member.add_roles(unverified_role)
 
+@tasks.loop(minutes=30)
+async def update_all_member_roles(client, token):
+    await client.login(token)
+    tier_icons = await fetch_tier_data()
+    for guild in client.guilds:
+        members = [member for member in guild.members if not member.bot]
+        for member in members:
+            await update_member_roles(member, tier_icons)
 
-class DiscordBot(discord.Client):
-    def __init__(self, bot_index, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.bot_index = bot_index
+@update_all_member_roles.before_loop
+async def before_update_all_member_roles(client):
+    await client.wait_until_ready()
 
-    async def on_member_join(self, member):
-        tier_icons = await fetch_tier_data()
-        await update_member_roles(member, tier_icons, self.bot_index)
+@client1.event
+async def on_ready():
+    update_all_member_roles.start(client1, DISCORD_BOT_TOKEN_1)
 
-    async def on_ready(self):
-        logging.info(f"{self.user} has connected to Discord!")
+@client2.event
+async def on_ready():
+    update_all_member_roles.start(client2, DISCORD_BOT_TOKEN_2)
 
-        self.update_all_member_roles.start(self)
+@client3.event
+async def on_ready():
+    update_all_member_roles.start(client3, DISCORD_BOT_TOKEN_3)
 
-    @tasks.loop(minutes=30)
-    async def update_all_member_roles(self):
-        tier_icons = await fetch_tier_data()
-        for guild in self.guilds:
-            members = [member for member in guild.members if not member.bot]
-            member_chunks = [members[i:i + len(members) // 3] for i in range(0, len(members), len(members) // 3)]
-            for member in member_chunks[self.bot_index]:
-                await update_member_roles(member, tier_icons, self.bot_index)
-
-    @update_all_member_roles.before_loop
-    async def before_update_all_member_roles(self):
-        await self.wait_until_ready()
-
-
-def main():
-    bots = []
-    for i in range(3):
-        bot = DiscordBot(bot_index=i, intents=intents)
-        bots.append(bot)
-
-    for i, bot in enumerate(bots):
-        bot.loop.create_task(bot.start(bot_tokens[i]))
-
-    for bot in bots:
-        bot.loop.run_forever()
-
-
-if __name__ == "__main__":
-    main()
+client1.run(DISCORD_BOT_TOKEN_1)
+client2.run(DISCORD_BOT_TOKEN_2)
+client3.run(DISCORD_BOT_TOKEN_3)
