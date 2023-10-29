@@ -26,7 +26,7 @@ async def get_user_by_id(user_id: int):
 
     client = discord.Client(intents=intents)
     client.event(on_ready)
-    await client.start(os.getenv("DISCORD_BOT_TOKEN"))
+    await client.start(os.getenv("DISCORD_BOT_TOKEN_1"))
 
     return user
 
