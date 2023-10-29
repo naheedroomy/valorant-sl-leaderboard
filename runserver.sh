@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # Run invite.py in the background and redirect stdout/stderr to nohup.out
-nohup python utils/discord_bot.sh > nohup_discord_bot.out 2>&1 &
+nohup python utils/bot1.py > nohup_discord_bot.out 2>&1 &
+nohup python utils/bot2.py > nohup_discord_bot.out 2>&1 &
+
 
 # Run update_db.py in the background and redirect stdout/stderr to nohup.out
 nohup python utils/update_db.py >> nohup_update_db.out 2>&1 &
