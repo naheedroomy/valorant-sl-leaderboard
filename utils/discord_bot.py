@@ -11,16 +11,12 @@ import pymongo
 intents = discord.Intents.default()
 intents.members = True
 
-client1 = discord.Client(intents=intents)
-client2 = discord.Client(intents=intents)
-client3 = discord.Client(intents=intents)
+client = discord.Client(intents=intents)
 
 # Set up connection to MongoDB
 MONGO_PASSWORD = os.getenv('MONGO_PASSWORD')
 MONGO_HOST = os.getenv('MONGO_HOST')
 DISCORD_BOT_TOKEN_1 = os.getenv('DISCORD_BOT_TOKEN_1')
-DISCORD_BOT_TOKEN_2 = os.getenv('DISCORD_BOT_TOKEN_2')
-DISCORD_BOT_TOKEN_3 = os.getenv('DISCORD_BOT_TOKEN_3')
 
 logging.basicConfig(
     filename='/root/log/discord_roles.log',
@@ -47,6 +43,7 @@ async def fetch_tier_data():
                 logging.error(f"Failed to fetch tier data: {response.status}")
                 return {}
 
+
 async def update_alpha_omega_roles(member, rank):
     alpha_ranks = ['Platinum', 'Diamond', 'Immortal', 'Ascendant', 'Radiant']
     omega_ranks = ['Gold', 'Silver', 'Iron', 'Bronze']
@@ -71,7 +68,6 @@ async def update_alpha_omega_roles(member, rank):
             await member.remove_roles(alpha_role)
         if omega_role in member.roles:
             await member.remove_roles(omega_role)
-
 
 async def update_member_roles(member, tier_icons):
     time.sleep(1.2)
@@ -152,31 +148,31 @@ async def update_member_roles(member, tier_icons):
         unverified_role = discord.utils.get(member.guild.roles, name="Unverified")
         await member.add_roles(unverified_role)
 
+
+@client.event
+async def on_member_join(member):
+    tier_icons = await fetch_tier_data()
+    await update_member_roles(member, tier_icons)
+
+
+# Create a lock to prevent overlapping tasks
+
 @tasks.loop(minutes=30)
-async def update_all_member_roles(client, token):
-    await client.login(token)
+async def update_all_member_roles():
     tier_icons = await fetch_tier_data()
     for guild in client.guilds:
         members = [member for member in guild.members if not member.bot]
         for member in members:
             await update_member_roles(member, tier_icons)
 
+
 @update_all_member_roles.before_loop
-async def before_update_all_member_roles(client):
+async def before_update_all_member_roles():
     await client.wait_until_ready()
 
-@client1.event
-async def on_ready():
-    update_all_member_roles.start(client1, DISCORD_BOT_TOKEN_1)
 
-@client2.event
+@client.event
 async def on_ready():
-    update_all_member_roles.start(client2, DISCORD_BOT_TOKEN_2)
+    update_all_member_roles.start()
 
-@client3.event
-async def on_ready():
-    update_all_member_roles.start(client3, DISCORD_BOT_TOKEN_3)
-
-client1.run(DISCORD_BOT_TOKEN_1)
-client2.run(DISCORD_BOT_TOKEN_2)
-client3.run(DISCORD_BOT_TOKEN_3)
+client.run(DISCORD_BOT_TOKEN_1)
