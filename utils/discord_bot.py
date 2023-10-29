@@ -1,7 +1,7 @@
 import logging
 import os
 import time
-
+import asyncio
 import aiohttp
 import discord
 from discord.ext import tasks
@@ -210,11 +210,15 @@ async def on_ready():
     update_all_member_roles_2.start()
     print(f'{client2.user} has connected to Discord!')
 
-# Start the first bot
-client.loop.create_task(client.start(DISCORD_BOT_TOKEN_1))
+async def main():
+    # Start the first bot
+    client.loop.create_task(client.start(DISCORD_BOT_TOKEN_1))
 
-# Start the second bot
-client2.loop.create_task(client2.start(DISCORD_BOT_TOKEN_2))
+    # Start the second bot
+    client2.loop.create_task(client2.start(DISCORD_BOT_TOKEN_2))
 
-# Run the event loop
-client.loop.run_forever()
+    # Run the event loop
+    await client.loop.run_forever()
+
+# Run the main function in an async context
+asyncio.run(main())
