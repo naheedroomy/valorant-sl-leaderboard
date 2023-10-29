@@ -158,14 +158,17 @@ async def on_member_join(member):
 
 # Create a lock to prevent overlapping tasks
 
+# Create an asyncio lock
+lock = asyncio.Lock()
+
 @tasks.loop(minutes=30)
 async def update_all_member_roles():
-    tier_icons = await fetch_tier_data()
-    for guild in client.guilds:
-        members = [member for member in guild.members if not member.bot]
-        # Use asyncio.gather to process members concurrently
-        await asyncio.gather(*[update_member_roles(member, tier_icons) for member in members])
-
+    async with lock:
+        tier_icons = await fetch_tier_data()
+        for guild in client.guilds:
+            members = [member for member in guild.members if not member.bot]
+            # Use asyncio.gather to process members concurrently
+            await asyncio.gather(*[update_member_roles(member, tier_icons) for member in members])
 
 @update_all_member_roles.before_loop
 async def before_update_all_member_roles():
