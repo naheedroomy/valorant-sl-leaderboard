@@ -11,7 +11,6 @@ import pymongo
 intents = discord.Intents.default()
 intents.members = True
 
-client = discord.Client(intents=intents)
 client2 = discord.Client(intents=intents)
 
 
@@ -152,32 +151,6 @@ async def update_member_roles(member, tier_icons):
         await member.add_roles(unverified_role)
 
 
-@client.event
-async def on_member_join(member):
-    tier_icons = await fetch_tier_data()
-    await update_member_roles(member, tier_icons)
-
-
-# Create a lock to prevent overlapping tasks
-
-@tasks.loop(minutes=30)
-async def update_all_member_roles():
-    tier_icons = await fetch_tier_data()
-    for guild in client.guilds:
-        members = [member for member in guild.members if not member.bot]
-        members_count = len(members)
-        members.sort(key=lambda x: x.name)
-        first_half = members[:members_count // 2 + members_count % 2]
-        second_half = members[members_count // 2 + members_count % 2:]
-
-        # Process the first half of the members
-        for member in first_half:
-            await update_member_roles(member, tier_icons)
-
-
-@update_all_member_roles.before_loop
-async def before_update_all_member_roles():
-    await client.wait_until_ready()
 
 
 @tasks.loop(minutes=30)
@@ -199,10 +172,6 @@ async def update_all_member_roles_2():
 async def before_update_all_member_roles_2():
     await client2.wait_until_ready()
 
-@client.event
-async def on_ready():
-    update_all_member_roles.start()
-    print(f'{client.user} has connected to Discord!')
 
 # Define a second on_ready event for the second bot
 @client2.event
@@ -210,14 +179,7 @@ async def on_ready():
     update_all_member_roles_2.start()
     print(f'{client2.user} has connected to Discord!')
 
-async def main():
-    # Start the first bot
-
-    # Start the second bot
-    client2.loop.create_task(client2.start(DISCORD_BOT_TOKEN_2))
-
-    # Run the event loop
-    await client.loop.run_forever()
 
 # Run the main function in an async context
-asyncio.run(main())
+client2.run(DISCORD_BOT_TOKEN_2)
+
