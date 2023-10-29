@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import os
 import time
@@ -13,11 +12,14 @@ intents = discord.Intents.default()
 intents.members = True
 
 client = discord.Client(intents=intents)
+client2 = discord.Client(intents=intents)
+
 
 # Set up connection to MongoDB
 MONGO_PASSWORD = os.getenv('MONGO_PASSWORD')
 MONGO_HOST = os.getenv('MONGO_HOST')
 DISCORD_BOT_TOKEN_1 = os.getenv('DISCORD_BOT_TOKEN_1')
+DISCORD_BOT_TOKEN_2 = os.getenv('DISCORD_BOT_TOKEN_2')
 
 logging.basicConfig(
     filename='/root/log/discord_roles.log',
@@ -71,7 +73,7 @@ async def update_alpha_omega_roles(member, rank):
             await member.remove_roles(omega_role)
 
 async def update_member_roles(member, tier_icons):
-    # time.sleep(1.2)
+    time.sleep(1.2)
 
     manual_role = discord.utils.get(member.guild.roles, name="Manual")
     if manual_role in member.roles:
@@ -158,25 +160,61 @@ async def on_member_join(member):
 
 # Create a lock to prevent overlapping tasks
 
-# Create an asyncio lock
-lock = asyncio.Lock()
-
 @tasks.loop(minutes=30)
 async def update_all_member_roles():
-    async with lock:
-        tier_icons = await fetch_tier_data()
-        for guild in client.guilds:
-            members = [member for member in guild.members if not member.bot]
-            # Use asyncio.gather to process members concurrently
-            await asyncio.gather(*[update_member_roles(member, tier_icons) for member in members])
+    tier_icons = await fetch_tier_data()
+    for guild in client.guilds:
+        members = [member for member in guild.members if not member.bot]
+        members_count = len(members)
+        members.sort(key=lambda x: x.name)
+        first_half = members[:members_count // 2 + members_count % 2]
+        second_half = members[members_count // 2 + members_count % 2:]
+
+        # Process the first half of the members
+        for member in first_half:
+            await update_member_roles(member, tier_icons)
+
 
 @update_all_member_roles.before_loop
 async def before_update_all_member_roles():
     await client.wait_until_ready()
 
 
+@tasks.loop(minutes=30)
+async def update_all_member_roles_2():
+    tier_icons = await fetch_tier_data()
+    for guild in client2.guilds:
+        members = [member for member in guild.members if not member.bot]
+        members_count = len(members)
+        members.sort(key=lambda x: x.name)
+        first_half = members[:members_count // 2 + members_count % 2]
+        second_half = members[members_count // 2 + members_count % 2:]
+
+        # Process the second half of the members
+        for member in second_half:
+            await update_member_roles(member, tier_icons)
+
+
+@update_all_member_roles_2.before_loop
+async def before_update_all_member_roles_2():
+    await client2.wait_until_ready()
+
 @client.event
 async def on_ready():
     update_all_member_roles.start()
+    print(f'{client.user} has connected to Discord!')
 
-client.run(DISCORD_BOT_TOKEN_1)
+# Define a second on_ready event for the second bot
+@client2.event
+async def on_ready():
+    update_all_member_roles_2.start()
+    print(f'{client2.user} has connected to Discord!')
+
+# Start the first bot
+client.loop.create_task(client.start(DISCORD_BOT_TOKEN_1))
+
+# Start the second bot
+client2.loop.create_task(client2.start(DISCORD_BOT_TOKEN_2))
+
+# Run the event loop
+client.loop.run_forever()
