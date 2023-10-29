@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 import time
@@ -70,7 +71,7 @@ async def update_alpha_omega_roles(member, rank):
             await member.remove_roles(omega_role)
 
 async def update_member_roles(member, tier_icons):
-    time.sleep(1.2)
+    # time.sleep(1.2)
 
     manual_role = discord.utils.get(member.guild.roles, name="Manual")
     if manual_role in member.roles:
@@ -162,8 +163,8 @@ async def update_all_member_roles():
     tier_icons = await fetch_tier_data()
     for guild in client.guilds:
         members = [member for member in guild.members if not member.bot]
-        for member in members:
-            await update_member_roles(member, tier_icons)
+        # Use asyncio.gather to process members concurrently
+        await asyncio.gather(*[update_member_roles(member, tier_icons) for member in members])
 
 
 @update_all_member_roles.before_loop
