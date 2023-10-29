@@ -165,7 +165,7 @@ class DiscordBot(discord.Client):
     async def on_ready(self):
         logging.info(f"{self.user} has connected to Discord!")
 
-        update_all_member_roles.start(self)
+        self.update_all_member_roles.start(self)
 
     @tasks.loop(minutes=30)
     async def update_all_member_roles(self):
