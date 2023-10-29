@@ -19,15 +19,18 @@ async def create_user_leaderboard(user: UserLeaderBoard):
     users_puuid = MongoUserLeaderBoard.objects(puuid=user.puuid).first()
     if users_puuid:
         return JSONResponse(status_code=400, content={"message": "Riot account already exists"})
-
-    created_user = MongoUserLeaderBoard(
-        puuid=user.puuid,
-        riot_username=user.riot_username,
-        discord_username=user.discord_username,
-        elo=user.elo,
-        rank=user.rank,
-    )
-    created_user.save()
+    try:
+        created_user = MongoUserLeaderBoard(
+            puuid=user.puuid,
+            riot_username=user.riot_username,
+            discord_username=user.discord_username,
+            elo=user.elo,
+            rank=user.rank,
+        )
+        created_user.save()
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=400, content={"message": "Error creating user"})
     return JSONResponse(status_code=200, content={"message": "User created"})
 
 

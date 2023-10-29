@@ -1,3 +1,5 @@
+import json
+
 import streamlit as st
 import requests
 
@@ -13,9 +15,6 @@ def show_registration_page():
     st.markdown("""
         # Register your account
         """)
-    st.markdown("""
-            # !!!Registration currently broken, please try again later!!!
-            """)
 
     # Initialize session state variables
     if 'username' not in st.session_state:
@@ -144,6 +143,8 @@ def show_registration_page():
                 "elo": account_json["elo"],
                 "rank": account_json["rank"],
             }
+            jsoned = json.dumps(user_leaderboard_data)
+            print(jsoned)
             leaderboard_response = requests.post(
                 "http://localhost:8000/leaderboard/register",
                 json=user_leaderboard_data,
