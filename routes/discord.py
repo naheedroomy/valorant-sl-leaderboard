@@ -27,7 +27,7 @@ async def get_user_by_id(user_id: int):
     client = discord.Client(intents=intents)
     client.event(on_ready)
     await client.start(os.getenv("DISCORD_BOT_TOKEN_1"))
-
+    print(user)
     return user
 
 @discord_route.post("/verify_discord_id/")
@@ -37,6 +37,8 @@ async def verify_discord_id(user: DiscordUser):
 
     if discord_user is None:
         raise HTTPException(status_code=404, detail="User not found")
+
+
 
     return {"discord_id": discord_user.id,
             "name": f"{discord_user.name}",

@@ -179,7 +179,7 @@ async def on_member_join(member):
     tier_icons = await fetch_tier_data()
     await update_member_roles(member, tier_icons)
 
-@tasks.loop(minutes=30)
+@tasks.loop(minutes=5)
 async def update_all_member_roles_2():
     count = 0
     start_time = time.time()

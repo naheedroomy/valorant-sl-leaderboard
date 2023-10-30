@@ -65,7 +65,11 @@ def show_registration_page():
                 if response.status_code == 200:
                     discord_data = response.json()
                     st.session_state.discord_name = discord_data["name"]
-                    st.session_state.discord_discriminator = discord_data["discriminator"]
+
+                    if not discord_data["discriminator"] == '#0':
+                        st.session_state.discord_discriminator = discord_data["discriminator"]
+                    else:
+                        st.session_state.discord_discriminator = ''
 
                     # Send a request to check if the Discord ID is already associated with a user
                     discord_username = f"{discord_data['name']}{discord_data['discriminator']}"
