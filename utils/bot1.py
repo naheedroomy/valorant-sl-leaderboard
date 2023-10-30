@@ -91,11 +91,9 @@ async def update_member_roles(member, tier_icons):
     #     discord_username = discord_username[:-2]
 
     discord_id = member.id
-
+    logging.info(f"Bot 111111 - Processing {discord_username}")
     query = {"discord_username": discord_username}
     result = collection.find_one(query)
-
-    logging.info(f"Bot 1 - Processing {discord_username}")
 
     if result:
         stored_discord_id = result.get("discord_id")
@@ -103,6 +101,18 @@ async def update_member_roles(member, tier_icons):
             update_query = {"discord_username": discord_username}
             new_values = {"$set": {"discord_id": discord_id}}
             logging.info(f"Updating discord_id for {discord_username} in the database.")
+            collection.update_one(update_query, new_values)
+
+    query = {"$or": [{"discord_id": discord_id}, {"discord_username": discord_username}]}
+    result = collection.find_one(query)
+    # logging.info("Bot 1 - Processing w/ modified username: " + discord_username)
+    if result:
+
+        # Update discord_username in the database if discord_id exists and discord_username is different
+        if "discord_id" in result and discord_id and discord_id != 0 and result["discord_username"] != discord_username:
+            update_query = {"discord_id": discord_id}
+            new_values = {"$set": {"discord_username": discord_username}}
+            logging.info(f"Updating discord_username for {discord_username} in the database.")
             collection.update_one(update_query, new_values)
 
         verified_role = discord.utils.get(member.guild.roles, name="Verified")
