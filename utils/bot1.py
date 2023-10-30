@@ -168,6 +168,7 @@ async def on_member_join(member):
 
 @tasks.loop(minutes=45)
 async def update_all_member_roles():
+    count = 0
     # get start time
     start_time = time.time()
     tier_icons = await fetch_tier_data()
@@ -180,10 +181,12 @@ async def update_all_member_roles():
 
         # Process the first half of the members
         for member in first_half:
+            count +=1
             await update_member_roles(member, tier_icons)
 #     calculate time taken
     time_taken = time.time() - start_time
     logging.info(f"Bot 1 - Time taken to update all member roles: {time_taken/60} minutes")
+    logging.info(f"Bot 1 - Total members processed: {count}")
 
 
 @update_all_member_roles.before_loop

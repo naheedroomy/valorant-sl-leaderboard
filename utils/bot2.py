@@ -166,13 +166,15 @@ async def on_member_join(member):
     tier_icons = await fetch_tier_data()
     await update_member_roles(member, tier_icons)
 
-@tasks.loop(minutes=45)
+@tasks.loop(minutes=30)
 async def update_all_member_roles_2():
+    count = 0
     start_time = time.time()
     tier_icons = await fetch_tier_data()
     for guild in client2.guilds:
         members = [member for member in guild.members if not member.bot]
         members_count = len(members)
+        logging.info(f"TOTAL MEMBERS : {members_count}")
         members.sort(key=lambda x: x.name)
         first_half = members[:members_count // 2 + members_count % 2]
         second_half = members[members_count // 2 + members_count % 2:]
@@ -180,8 +182,11 @@ async def update_all_member_roles_2():
         # Process the second half of the members
         for member in second_half:
             await update_member_roles(member, tier_icons)
+            count += 1
     time_taken = time.time() - start_time
     logging.info(f"Bot 2 - Time taken to update all member roles: {time_taken / 60} minutes")
+    logging.info(f"Bot 2 - Total members processed: {count}")
+
 
 
 @update_all_member_roles_2.before_loop
