@@ -91,7 +91,7 @@ async def update_member_roles(member, tier_icons):
         discord_username = discord_username[:-2]
 
     discord_id = member.id
-    if discord_id != 0:
+    if discord_id == 0:
         update_query = {"discord_username": discord_username}
         new_values = {"$set": {"discord_id": discord_id}}
         logging.info(f"Updating discord_id for {discord_username} in the database.")
