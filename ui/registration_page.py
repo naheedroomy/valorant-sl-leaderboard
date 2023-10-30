@@ -44,7 +44,7 @@ def show_registration_page():
         st.markdown("""
             ### Why do we need your Discord ID?<br>
             We need your Discord ID to verify your identity, and to send you messages in case of a prize/giveaway.<br>
-            We will **NOT** use your Discord ID for any other purpose, and it will be deleted after verifying.<br>           
+            We will **NOT** use your Discord ID for any other purpose.<br>           
             Your discord id is a 15-20 digit number that can be found by following the link below. (Example: 573602197214528560)<br>
             It is **NOT** your username. (**NOT** `username#1234`)
             """, unsafe_allow_html=True)
@@ -157,7 +157,7 @@ def show_registration_page():
             leaderboard_json = leaderboard_response.json()
             if leaderboard_response.status_code == 200:
                 st.success(leaderboard_json.get("message"))
-                st.markdown("[Join our Discord server!](https://discord.gg/kKVqZ4Du3J)")
+                st.markdown("[Join our Discord server!](https://discord.gg/sPVwAFNuV)")
 
             else:
                 st.error(leaderboard_json.get("message"))

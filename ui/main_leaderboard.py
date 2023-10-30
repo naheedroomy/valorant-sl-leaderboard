@@ -8,7 +8,7 @@ def show_main_leaderboard():
     st.write("To register yourself on the leaderboard, click on the 'Register' button on the sidebar.")
     st.write("Ranks are updated every 15 minutes.")
     # make the above text a link to the register page
-    st.markdown("[Join our Discord server!](https://discord.gg/kKVqZ4Du3J)")
+    st.markdown("[Join our Discord server!](https://discord.gg/sPVwAFNuV)")
 
     response = requests.get("http://localhost:8000/leaderboard/show/all")
     leaderboard_data = response.json()
