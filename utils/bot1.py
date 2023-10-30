@@ -87,6 +87,8 @@ async def update_member_roles(member, tier_icons):
 
     discord_id = member.id
     discord_username = str(member)
+    if "#" not in discord_username:
+        discord_username = discord_username + "#0"
     query = {"$or": [{"discord_id": discord_id}, {"discord_username": discord_username}]}
     result = collection.find_one(query)
     logging.info("Bot 1 - Processing: " + discord_username)
