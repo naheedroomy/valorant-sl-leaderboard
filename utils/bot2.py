@@ -87,13 +87,13 @@ async def update_member_roles(member, tier_icons):
 
     discord_id = member.id
     discord_username = str(member)
-    # check if there is a hashtag in the username, if not add a #0 to end of the string
-    if "#" not in discord_username:
-        discord_username = discord_username + "#0"
+    # check if the discord_username ends with #0 and if so, remove it
+    if discord_username.endswith("#0"):
+        discord_username = discord_username[:-2]
 
     query = {"$or": [{"discord_id": discord_id}, {"discord_username": discord_username}]}
     result = collection.find_one(query)
-    logging.info("Bot 2 - Processing: " + discord_username)
+    logging.info("Bot 2 - Processing w/ modified username: " + discord_username)
     if result:
 
 
