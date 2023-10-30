@@ -89,9 +89,9 @@ async def update_member_roles(member, tier_icons):
     discord_username = str(member)
     query = {"$or": [{"discord_id": discord_id}, {"discord_username": discord_username}]}
     result = collection.find_one(query)
-
+    logging.info("Bot 2 - Processing: " + discord_username)
     if result:
-        logging.info("Bot 2 - Processing: " + discord_username)
+
 
         # Update discord_username in the database if discord_id exists and discord_username is different
         if "discord_id" in result and discord_id != 0 and result["discord_username"] != discord_username:
