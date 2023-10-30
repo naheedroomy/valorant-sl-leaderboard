@@ -155,14 +155,18 @@ async def update_member_roles(member, tier_icons):
 
 @client.event
 async def on_member_join(member):
+    print(f"Bot 1 - {member} has joined the server!")
     tier_icons = await fetch_tier_data()
     await update_member_roles(member, tier_icons)
 
 
+
 # Create a lock to prevent overlapping tasks
 
-@tasks.loop(minutes=30)
+@tasks.loop(minutes=45)
 async def update_all_member_roles():
+    # get start time
+    start_time = time.time()
     tier_icons = await fetch_tier_data()
     for guild in client.guilds:
         members = [member for member in guild.members if not member.bot]
@@ -174,6 +178,9 @@ async def update_all_member_roles():
         # Process the first half of the members
         for member in first_half:
             await update_member_roles(member, tier_icons)
+#     calculate time taken
+    time_taken = time.time() - start_time
+    logging.info(f"Bot 1 - Time taken to update all member roles: {time_taken/60} minutes")
 
 
 @update_all_member_roles.before_loop
