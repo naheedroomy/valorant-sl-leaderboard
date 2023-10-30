@@ -11,14 +11,14 @@ import pymongo
 intents = discord.Intents.default()
 intents.members = True
 
-client2 = discord.Client(intents=intents)
+client3 = discord.Client(intents=intents)
 
 
 # Set up connection to MongoDB
 MONGO_PASSWORD = os.getenv('MONGO_PASSWORD')
 MONGO_HOST = os.getenv('MONGO_HOST')
 DISCORD_BOT_TOKEN_1 = os.getenv('DISCORD_BOT_TOKEN_1')
-DISCORD_BOT_TOKEN_2 = os.getenv('DISCORD_BOT_TOKEN_2')
+DISCORD_BOT_TOKEN_3 = os.getenv('DISCORD_BOT_TOKEN_3')
 
 logging.basicConfig(
     filename='/root/log/discord_usernames.log',
@@ -61,7 +61,7 @@ async def update_all_member_roles_2():
     count = 0
     start_time = time.time()
     tier_icons = await fetch_tier_data()
-    for guild in client2.guilds:
+    for guild in client3.guilds:
         members = [member for member in guild.members if not member.bot]
 
         # Process the second half of the members
@@ -72,16 +72,16 @@ async def update_all_member_roles_2():
 
 @update_all_member_roles_2.before_loop
 async def before_update_all_member_roles_2():
-    await client2.wait_until_ready()
+    await client3.wait_until_ready()
 
 
 # Define a second on_ready event for the second bot
-@client2.event
+@client3.event
 async def on_ready():
     update_all_member_roles_2.start()
-    print(f'{client2.user} has connected to Discord!')
+    print(f'{client3.user} has connected to Discord!')
 
 
 # Run the main function in an async context
-client2.run(DISCORD_BOT_TOKEN_2)
+client3.run(DISCORD_BOT_TOKEN_3)
 
