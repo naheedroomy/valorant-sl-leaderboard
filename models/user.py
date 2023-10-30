@@ -102,6 +102,10 @@ class MongoUserLeaderBoard(Document):
 
 
 class UserLeaderBoard(BaseModel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(args, kwargs)
+        self.discord_id = None
+
     elo: Optional[float]
     rank: Optional[constr(min_length=1, max_length=50)]
     puuid: Optional[constr(min_length=1, max_length=50)]

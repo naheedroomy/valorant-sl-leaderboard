@@ -26,6 +26,7 @@ async def create_user_leaderboard(user: UserLeaderBoard):
             discord_username=user.discord_username,
             elo=user.elo,
             rank=user.rank,
+            discord_id=user.discord_id
         )
         created_user.save()
     except Exception as e:
