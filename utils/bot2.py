@@ -171,13 +171,13 @@ async def update_member_roles(member, tier_icons):
         await member.add_roles(unverified_role)
 
 
-
-@client2.event
-async def on_member_join(member):
-    time.sleep(30)
-    print(f"Bot 2 - {member} has joined the server!")
-    tier_icons = await fetch_tier_data()
-    await update_member_roles(member, tier_icons)
+#
+# @client2.event
+# async def on_member_join(member):
+#     time.sleep(30)
+#     print(f"Bot 2 - {member} has joined the server!")
+#     tier_icons = await fetch_tier_data()
+#     await update_member_roles(member, tier_icons)
 
 @tasks.loop(minutes=5)
 async def update_all_member_roles_2():
