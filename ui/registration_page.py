@@ -142,7 +142,7 @@ def show_registration_page():
                 "discord_username": discord_username,
                 "elo": account_json["elo"],
                 "rank": account_json["rank"],
-                "discord_id": st.session_state.discord_id
+                "discord_id": int(st.session_state.discord_id)
             }
             jsoned = json.dumps(user_leaderboard_data)
             print(jsoned)
