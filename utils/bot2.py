@@ -87,15 +87,21 @@ async def update_member_roles(member, tier_icons):
 
     discord_username = str(member)
     # check if the discord_username ends with #0 and if so, remove it
-    if discord_username.endswith("#0"):
-        discord_username = discord_username[:-2]
+    # if discord_username.endswith("#0"):
+    #     discord_username = discord_username[:-2]
 
     discord_id = member.id
-    if discord_id == 0:
-        update_query = {"discord_username": discord_username}
-        new_values = {"$set": {"discord_id": discord_id}}
-        logging.info(f"Updating discord_id for {discord_username} in the database.")
-        collection.update_one(update_query, new_values)
+    logging.info(f"Bot 2 - Processing {discord_username}")
+    query = {"discord_username": discord_username}
+    result = collection.find_one(query)
+
+    if result:
+        stored_discord_id = result.get("discord_id")
+        if stored_discord_id == 0 or stored_discord_id is None:
+            update_query = {"discord_username": discord_username}
+            new_values = {"$set": {"discord_id": discord_id}}
+            logging.info(f"Updating discord_id for {discord_username} in the database.")
+            collection.update_one(update_query, new_values)
 
     query = {"$or": [{"discord_id": discord_id}, {"discord_username": discord_username}]}
     result = collection.find_one(query)
