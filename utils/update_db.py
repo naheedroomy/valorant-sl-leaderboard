@@ -93,6 +93,12 @@ async def update_all_users():
         obtained_user.save()
         count += 1
 
+        # Check if discord_username ends with #0
+        if obtained_user.discord_username.endswith('#0'):
+            obtained_user.discord_username = obtained_user.discord_username.rstrip(
+                '#0')  # Remove #0 from discord_username
+            obtained_user.save()
+
     logging.info(f"Users updated: {count}")
 
 
