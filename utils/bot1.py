@@ -179,7 +179,7 @@ async def on_member_join(member):
 
 # Create a lock to prevent overlapping tasks
 
-@tasks.loop(minutes=5)
+@tasks.loop(minutes=15)
 async def update_all_member_roles():
     count = 0
     # get start time
