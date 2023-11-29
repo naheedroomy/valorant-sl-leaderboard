@@ -93,7 +93,7 @@ async def update_member_roles(member, tier_icons):
         #     discord_username = discord_username[:-2]
 
         discord_id = member.id
-        logging.info(f"Bot 111111 - Processing {discord_username}")
+        logging.info(f"[ BOT 2 ] - Processing {discord_username}")
         query = {"discord_username": discord_username}
         result = collection.find_one(query)
 
@@ -107,7 +107,7 @@ async def update_member_roles(member, tier_icons):
 
         query = {"$or": [{"discord_id": discord_id}, {"discord_username": discord_username}]}
         result = collection.find_one(query)
-        # logging.info("Bot 1 - Processing w/ modified username: " + discord_username)
+        # logging.info("[ BOT 2 ] - Processing w/ modified username: " + discord_username)
         if result:
 
             # Update discord_username in the database if discord_id exists and discord_username is different
@@ -188,7 +188,7 @@ async def update_member_roles(member, tier_icons):
 # @client2.event
 # async def on_member_join(member):
 #     time.sleep(30)
-#     print(f"Bot 2 - {member} has joined the server!")
+#     print(f"[ BOT 2 ] - {member} has joined the server!")
 #     tier_icons = await fetch_tier_data()
 #     await update_member_roles(member, tier_icons)
 
@@ -210,8 +210,8 @@ async def update_all_member_roles_2():
             await update_member_roles(member, tier_icons)
             count += 1
     time_taken = time.time() - start_time
-    logging.info(f"Bot 2 - Time taken to update all member roles: {time_taken / 60} minutes")
-    logging.info(f"Bot 2 - Total members processed: {count}")
+    logging.info(f"[ BOT 2 ] - Time taken to update all member roles: {time_taken / 60} minutes")
+    logging.info(f"[ BOT 2 ] - Total members processed: {count}")
 
 
 async def main_loop():
@@ -224,6 +224,7 @@ async def main_loop():
             logging.error(f"Error in main loop: {e}")
         finally:
             # Wait for 15 minutes before next iteration
+            logging.info("[ BOT 2 ] - Sleeping for 15 minutes before next iteration.")
             await asyncio.sleep(15 * 60)
 
 @client2.event
