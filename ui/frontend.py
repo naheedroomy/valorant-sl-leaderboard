@@ -45,7 +45,7 @@ def get_rank_color(rank):
         return "black"
 
 
-page = st.sidebar.radio("Navigation: ", ("Competitive Ranked Leaderboard", "Register"))
+page = st.sidebar.radio("Navigation: ", ("Competitive Ranked Leaderboard","10 mans - Alpha Leaderboard", "Register"))
 
 if page == "Register":
     show_registration_page()
